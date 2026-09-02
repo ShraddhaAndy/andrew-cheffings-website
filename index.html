@@ -73,12 +73,29 @@
   }
   .btn-primary{ background:var(--accent); color:var(--bg); }
   .btn-primary:hover{ background:var(--ivory); transform:translateY(-2px); box-shadow:0 12px 30px -10px rgba(0,0,0,.5); }
-  .btn-ghost{ border-color:rgba(243,239,231,.35); color:var(--ivory); }
+  .btn-ghost{ border-color:rgba(243,239,231,.35); color:var(--ivory); background:transparent; }
   .btn-ghost:hover{ border-color:var(--ivory); background:rgba(243,239,231,.06); transform:translateY(-2px); }
   .btn-dark{ border-color:rgba(17,23,19,.4); color:var(--bg); }
   .btn-dark:hover{ background:rgba(17,23,19,.08); }
   .btn-arrow{ transition:transform .4s var(--ease); }
   .btn:hover .btn-arrow{ transform:translateX(4px); }
+
+  .btn-blog-buy{
+    margin-top:auto;
+    padding:10px 18px;
+    font-size:11.5px;
+    letter-spacing:.12em;
+    border:1px solid var(--accent);
+    color:var(--accent);
+    background:transparent;
+    text-transform:uppercase;
+    align-self:flex-start;
+    transition:all .3s var(--ease);
+  }
+  .btn-blog-buy:hover{
+    background:var(--accent);
+    color:var(--bg);
+  }
 
   .link-underline{ position:relative; display:inline-block; }
   .link-underline::after{
@@ -316,20 +333,52 @@
   .writing-card p{ color:var(--parchment); font-size:15.5px; margin-bottom:var(--space-3); }
   @media (max-width:760px){ .writing-panel{ grid-template-columns:1fr; } }
 
-  /* ---------------- JOURNAL ---------------- */
+  /* ---------------- JOURNAL (DYNAMIC AUTOMATION & CARDS) ---------------- */
   .journal-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:var(--space-5); flex-wrap:wrap; gap:var(--space-2); }
   .journal-head h2{ font-size:clamp(30px,4vw,46px); color:var(--ivory); }
   .journal-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--space-5); }
-  .journal-card{ display:flex; flex-direction:column; }
-  .journal-thumb{ aspect-ratio:2/1; overflow:hidden; margin-bottom:var(--space-3); background:var(--bg2); }
+  .journal-card{
+    background:var(--bg2);
+    border:1px solid rgba(243,239,231,.08);
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    transition:transform .4s var(--ease), border-color .4s var(--ease);
+  }
+  .journal-card:hover{
+    transform:translateY(-4px);
+    border-color:rgba(184,155,98,.3);
+  }
+  .journal-thumb{ aspect-ratio:2/1; overflow:hidden; margin-bottom:var(--space-3); background:#000; }
   .journal-thumb img{ width:100%; height:100%; object-fit:cover; transition:transform .7s var(--ease); }
   .journal-card:hover .journal-thumb img{ transform:scale(1.05); }
-  .journal-date{ font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; }
-  .journal-card h3{ font-size:21px; color:var(--ivory); font-weight:400; line-height:1.3; margin-bottom:10px; }
-  .journal-card p{ font-size:14.5px; color:var(--parchment); margin-bottom:12px; }
+  .journal-date{ font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; display:block; }
+  .journal-card h3{ font-size:21px; color:var(--ivory); font-weight:400; line-height:1.3; margin-bottom:12px; }
+  .journal-card p{ font-size:14.5px; color:var(--parchment); margin-bottom:18px; flex-grow:1; }
   .journal-divider{ height:1px; background:rgba(243,239,231,.12); margin:var(--space-6) 0 0; }
   @media (max-width:900px){ .journal-grid{ grid-template-columns:1fr 1fr; } }
   @media (max-width:600px){ .journal-grid{ grid-template-columns:1fr; } }
+
+  /* ---------------- DEDICATED BLOG VIEW (MODAL / SEPARATE PAGE EFFECT) ---------------- */
+  .blog-overlay{
+    position:fixed;
+    inset:0;
+    z-index:999;
+    background:var(--bg);
+    overflow-y:auto;
+    padding:60px 0;
+    display:none;
+  }
+  .blog-overlay.active{ display:block; }
+  .blog-overlay-head{
+    display:flex; justify-content:space-between; align-items:center; margin-bottom:40px; padding-bottom:20px;
+    border-bottom:1px solid rgba(243,239,231,.1);
+  }
+  .close-blog-btn{
+    background:none; border:1px solid rgba(243,239,231,.3); color:var(--ivory);
+    padding:10px 20px; font-size:13px; text-transform:uppercase; cursor:pointer;
+  }
+  .close-blog-btn:hover{ border-color:var(--accent); color:var(--accent); }
 
   /* ---------------- NEWSLETTER ---------------- */
   .newsletter-panel{
@@ -610,7 +659,7 @@
           <span class="hx-motif">Growing Up</span>
           <span class="hx-motif">Cross-Channel Friendship</span>
         </div>
-        <a href="https://www.goodreads.com/book/show/248138221-harry-and-xavier" target="_blank" rel="noopener" class="btn btn-primary">Discover on Goodreads <span class="btn-arrow">&rarr;</span></a>
+        <a href="https://www.goodreads.com/author/show/21533034.Andrew_Cheffings" target="_blank" rel="noopener" class="btn btn-primary">Discover on Goodreads <span class="btn-arrow">&rarr;</span></a>
       </div>
     </div>
   </section>
@@ -632,38 +681,17 @@
     </div>
   </section>
 
-  <!-- JOURNAL -->
+  <!-- JOURNAL (AUTOMATED & CONNECTED TO SEPARATE VIEW) -->
   <section class="panel-dark section-pad" id="journal">
     <div class="wrap">
       <div class="journal-head reveal">
         <h2>From the Journal</h2>
+        <button type="button" class="btn btn-ghost link-underline" onclick="openBlogOverlay()">View All Journal Posts &rarr;</button>
       </div>
-      <div class="journal-grid">
-        <article class="journal-card reveal">
-          <div class="journal-thumb">
-            <img src="https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto:good,w_600/vlf6mwjhel1p2xc4u2mtl3odd1ly" alt="Journal illustration for Music became the only place where their silence could finally speak" loading="lazy">
-          </div>
-          <span class="journal-date">August 24, 2026</span>
-          <h3>&ldquo;Music became the only place where their silence could finally speak.&rdquo;</h3>
-          <p>In <em>Green Twining</em>, Joe, Sean, Tim and David hide their inner lives beneath a veneer of normality. It is music that sets them free, allowing a little light to shine out — the light of hidden, forbidden love.</p>
-        </article>
-        <article class="journal-card reveal reveal-delay-1">
-          <div class="journal-thumb">
-            <img src="https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto:good,w_600/93dzsxqa3jd94nm6h04yaxmr4srr" alt="Journal illustration for Some connections arrive like a storm" loading="lazy">
-          </div>
-          <span class="journal-date">August 14, 2026</span>
-          <h3>&ldquo;Some connections arrive like a storm — unwanted, undeniable, and impossible to forget.&rdquo;</h3>
-          <p>In <em>Green Twining</em>, the Coffin family's life moves slowly, silently, haunted by the ghosts of the past — until Joe's spinet playing, and an old friend's idea for a folk trio, begin to change things.</p>
-        </article>
-        <article class="journal-card reveal reveal-delay-2">
-          <div class="journal-thumb">
-            <img src="https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto:good,w_600/3xlm0f7hl671lfa1gsh1hfy71gyp" alt="Journal illustration for Some places do not fall apart all at once" loading="lazy">
-          </div>
-          <span class="journal-date">July 20, 2026</span>
-          <h3>&ldquo;Some places don't fall apart all at once — they quietly carry their decline.&rdquo;</h3>
-          <p>In <em>Green Twining</em>, the Coffin family's farmhouse is slowly crumbling into the stream which flows by it. At night ancient beams and floorboards creak and groan.</p>
-        </article>
-      </div>
+
+      <!-- Homepage Latest 3 Posts Render Dynamically Here -->
+      <div class="journal-grid" id="homepageJournalGrid"></div>
+
       <div class="journal-divider reveal"></div>
     </div>
   </section>
@@ -709,6 +737,23 @@
 
 </main>
 
+<!-- DEDICATED BLOG VIEW (SEPARATE PAGE MODAL) -->
+<div class="blog-overlay" id="blogOverlay">
+  <div class="wrap">
+    <div class="blog-overlay-head">
+      <div>
+        <span class="eyebrow">The Complete Journal &amp; Blog</span>
+        <h2 style="font-size:clamp(32px, 4vw, 54px); margin-top:10px;">All Articles &amp; Excerpts</h2>
+      </div>
+      <button type="button" class="close-blog-btn" onclick="closeBlogOverlay()">&times; Close &amp; Return</button>
+    </div>
+    <p style="color:var(--parchment); max-width:600px; margin-bottom:40px;">Explore all short writings, literary notes, and story previews by Andrew Cheffings.</p>
+    
+    <!-- All Posts Render Here Dynamically -->
+    <div class="journal-grid" id="fullArchiveJournalGrid"></div>
+  </div>
+</div>
+
 <footer id="contact">
   <div class="wrap">
     <div class="footer-top">
@@ -722,7 +767,7 @@
           <a href="#books">Books</a>
           <a href="#about">About</a>
           <a href="#writing">Writing</a>
-          <a href="#journal">Blog</a>
+          <a href="#journal" onclick="openBlogOverlay()">Blog</a>
         </div>
         <div class="footer-col">
           <h4>Connect</h4>
@@ -776,6 +821,80 @@
     });
   }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
   revealEls.forEach(el => io.observe(el));
+
+  /* =======================================================
+     AUTOMATED BLOG SYSTEM (IMAGE + TEXT + CTA LINK)
+     Andrew can easily add new posts to the top of this list!
+     ======================================================= */
+  const BLOGS_DATA = [
+    {
+      title: "Music became the only place where their silence could finally speak.",
+      date: "August 24, 2026",
+      image: "https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto,w_600/vlf6mwjhel1p2xc4u2mtl3odd1ly",
+      text: "In Green Twining, Joe, Sean, Tim and David hide their inner lives beneath a veneer of normality. It is music that sets them free, allowing a little light to shine out — the light of hidden, forbidden love.",
+      ctaText: "Buy Green Twining &rarr;",
+      ctaLink: "https://www.amazon.co.uk/Green-Twining-Sometimes-little-untangling-ebook/dp/B0CTKVBGWS/"
+    },
+    {
+      title: "Some connections arrive like a storm — unwanted, undeniable, and impossible to forget.",
+      date: "August 14, 2026",
+      image: "https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto,w_600/93dzsxqa3jd94nm6h04yaxmr4srr",
+      text: "In Green Twining, the Coffin family's life moves slowly, silently, haunted by the ghosts of the past — until Joe's spinet playing, and an old friend's idea for a folk trio, begin to change things.",
+      ctaText: "Explore Bookshop.org &rarr;",
+      ctaLink: "https://bookshop.org/p/books/harry-and-xavier-andrew-cheffings/5295808dc3ea4c7f?ean=9781919391205&affiliate=22216"
+    },
+    {
+      title: "Some places don't fall apart all at once — they quietly carry their decline.",
+      date: "July 20, 2026",
+      image: "https://res.cloudinary.com/wellfleet/image/upload/ar_2,c_fill,f_auto,q_auto,w_600/3xlm0f7hl671lfa1gsh1hfy71gyp",
+      text: "In Green Twining, the Coffin family's farmhouse is slowly crumbling into the stream which flows by it. At night ancient beams and floorboards creak and groan.",
+      ctaText: "Read Green Twining &rarr;",
+      ctaLink: "https://www.amazon.co.uk/Green-Twining-Sometimes-little-untangling-ebook/dp/B0CTKVBGWS/"
+    }
+  ];
+
+  function createBlogCardHTML(post) {
+    return `
+      <article class="journal-card">
+        <div class="journal-thumb">
+          <img src="${post.image}" alt="${post.title}" loading="lazy">
+        </div>
+        <span class="journal-date">${post.date}</span>
+        <h3>&ldquo;${post.title}&rdquo;</h3>
+        <p>${post.text}</p>
+        <a href="${post.ctaLink}" target="_blank" rel="noopener" class="btn btn-blog-buy">${post.ctaText}</a>
+      </article>
+    `;
+  }
+
+  function renderDynamicBlogs() {
+    const homeGrid = document.getElementById('homepageJournalGrid');
+    const fullGrid = document.getElementById('fullArchiveJournalGrid');
+
+    // Render Latest 3 Posts on Homepage
+    const latestThree = BLOGS_DATA.slice(0, 3);
+    if (homeGrid) {
+      homeGrid.innerHTML = latestThree.map(createBlogCardHTML).join('');
+    }
+
+    // Render All Posts in the Dedicated Archive View
+    if (fullGrid) {
+      fullGrid.innerHTML = BLOGS_DATA.map(createBlogCardHTML).join('');
+    }
+  }
+
+  function openBlogOverlay() {
+    document.getElementById('blogOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeBlogOverlay() {
+    document.getElementById('blogOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Initialize blogs on page load
+  renderDynamicBlogs();
 </script>
 
 </body>
