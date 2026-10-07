@@ -354,10 +354,54 @@
   .journal-card:hover .journal-thumb img{ transform:scale(1.05); }
   .journal-date{ font-size:11.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin-bottom:8px; display:block; }
   .journal-card h3{ font-size:21px; color:var(--ivory); font-weight:400; line-height:1.3; margin-bottom:12px; }
-  .journal-card p{ font-size:14.5px; color:var(--parchment); margin-bottom:18px; flex-grow:1; }
   .journal-divider{ height:1px; background:rgba(243,239,231,.12); margin:var(--space-6) 0 0; }
   @media (max-width:900px){ .journal-grid{ grid-template-columns:1fr 1fr; } }
   @media (max-width:600px){ .journal-grid{ grid-template-columns:1fr; } }
+
+  /* ---------------- READ MORE ACCORDION ---------------- */
+  .blog-text-container {
+    max-height: 110px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.45s var(--ease);
+    margin-bottom: 8px;
+  }
+  .blog-text-container p {
+    font-size: 14.5px;
+    color: var(--parchment);
+    line-height: 1.6;
+  }
+  .blog-text-container.expanded {
+    max-height: 2500px;
+  }
+  .blog-text-container:not(.expanded)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 45px;
+    background: linear-gradient(transparent, var(--bg2));
+    pointer-events: none;
+  }
+  .btn-read-more {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: var(--sans);
+    font-size: 12px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 2px 0 14px 0;
+    display: inline-block;
+    text-align: left;
+    transition: opacity .3s var(--ease);
+  }
+  .btn-read-more:hover {
+    color: var(--ivory);
+  }
 
   /* ---------------- DEDICATED BLOG VIEW (MODAL / SEPARATE PAGE EFFECT) ---------------- */
   .blog-overlay{
@@ -823,17 +867,17 @@
   revealEls.forEach(el => io.observe(el));
 
   /* =======================================================
-     AUTOMATED BLOG SYSTEM (IMAGE + TEXT + CTA LINK)
-     Andrew can easily add new posts to the top of this list!
+      AUTOMATED BLOG SYSTEM (IMAGE + TEXT + CTA LINK)
+      Andrew can easily add new posts to the top of this list!
      ======================================================= */
   const BLOGS_DATA = [
     {
-    title: "He looked at himself and began to question what he saw…",
-    date: "October 7, 2026",
-    image: "blog-4..png",
-    text: "In the novel 'Green Twining' Joe Coffin lives in a big old semi-derelict farmhouse out on the Lincolnshire Marsh with his parents. When he was a young child several of the rooms were disused or derelict, and even as a young adult there were still strange, corridor-like spaces connecting the different parts of the long, rambling building.<br><br>At the end of one of these corridor-like spaces hung a big and ancient framed photograph of Joe's paternal Great Grandparents. The photo was in a part of the house which was always quite shadowy, and his Great Grandparents looked stiff and rather stern, and really quite scary, especially his Great Grandfather.<br><br>After a few years of having to walk past this severe-looking image to get to his bedroom, Joe started to notice that although his Great Grandfather was pale, with straight, fair hair, and pale eyes, his Great Grandmother's hair, although severely pulled back into a bun, was – underneath – very dark, quite kinky, and wild. Her eyes, despite her severe pose, were warmly dark, her skin was amber-coloured, and her lips were full.<br><br>At school, the few children of colour were treated differently to their white classmates by the white teachers and were sometimes verbally abused. And Joe began to look at himself in his bedroom mirror and wonder what difficulties were hidden in the photo of his Great Grandparents, also maybe hidden within himself. And he began to wonder about all the stories about what a harsh man his Grandfather was.",
-    ctaText: "Buy Green Twining &rarr;",
-    ctaLink: "https://www.amazon.co.uk/Green-Twining-Sometimes-little-untangling-ebook/dp/B0CTKVBGWS/"
+      title: "He looked at himself and began to question what he saw…",
+      date: "October 7, 2026",
+      image: "blog-4..png",
+      text: "In the novel 'Green Twining' Joe Coffin lives in a big old semi-derelict farmhouse out on the Lincolnshire Marsh with his parents. When he was a young child several of the rooms were disused or derelict, and even as a young adult there were still strange, corridor-like spaces connecting the different parts of the long, rambling building.<br><br>At the end of one of these corridor-like spaces hung a big and ancient framed photograph of Joe's paternal Great Grandparents. The photo was in a part of the house which was always quite shadowy, and his Great Grandparents looked stiff and rather stern, and really quite scary, especially his Great Grandfather.<br><br>After a few years of having to walk past this severe-looking image to get to his bedroom, Joe started to notice that although his Great Grandfather was pale, with straight, fair hair, and pale eyes, his Great Grandmother's hair, although severely pulled back into a bun, was – underneath – very dark, quite kinky, and wild. Her eyes, despite her severe pose, were warmly dark, her skin was amber-coloured, and her lips were full.<br><br>At school, the few children of colour were treated differently to their white classmates by the white teachers and were sometimes verbally abused. And Joe began to look at himself in his bedroom mirror and wonder what difficulties were hidden in the photo of his Great Grandparents, also maybe hidden within himself. And he began to wonder about all the stories about what a harsh man his Grandfather was.",
+      ctaText: "Buy Green Twining &rarr;",
+      ctaLink: "https://www.amazon.co.uk/Green-Twining-Sometimes-little-untangling-ebook/dp/B0CTKVBGWS/"
     },
     
     {
@@ -889,7 +933,10 @@
     }
   ];
 
-  function createBlogCardHTML(post) {
+  function createBlogCardHTML(post, index, prefix = 'home') {
+    const isLong = post.text.length > 220;
+    const containerId = `blog-text-${prefix}-${index}`;
+
     return `
       <article class="journal-card">
         <div class="journal-thumb">
@@ -897,7 +944,12 @@
         </div>
         <span class="journal-date">${post.date}</span>
         <h3>&ldquo;${post.title}&rdquo;</h3>
-        <p>${post.text}</p>
+        <div class="blog-text-container" id="${containerId}">
+          <p>${post.text}</p>
+        </div>
+        ${isLong ? `
+          <button type="button" class="btn-read-more" onclick="toggleReadMore('${containerId}', this)">Read More +</button>
+        ` : ''}
         <a href="${post.ctaLink}" target="_blank" rel="noopener" class="btn btn-blog-buy">${post.ctaText}</a>
       </article>
     `;
@@ -910,12 +962,25 @@
     // Render Latest 3 Posts on Homepage
     const latestThree = BLOGS_DATA.slice(0, 3);
     if (homeGrid) {
-      homeGrid.innerHTML = latestThree.map(createBlogCardHTML).join('');
+      homeGrid.innerHTML = latestThree.map((post, i) => createBlogCardHTML(post, i, 'home')).join('');
     }
 
     // Render All Posts in the Dedicated Archive View
     if (fullGrid) {
-      fullGrid.innerHTML = BLOGS_DATA.map(createBlogCardHTML).join('');
+      fullGrid.innerHTML = BLOGS_DATA.map((post, i) => createBlogCardHTML(post, i, 'archive')).join('');
+    }
+  }
+
+  function toggleReadMore(containerId, btn) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (container.classList.contains('expanded')) {
+      container.classList.remove('expanded');
+      btn.textContent = 'Read More +';
+    } else {
+      container.classList.add('expanded');
+      btn.textContent = 'Show Less −';
     }
   }
 
